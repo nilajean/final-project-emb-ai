@@ -4,33 +4,23 @@ from EmotionDetection.emotion_detection import emotion_detector
 app = Flask("Emotion Detector")
 
 @app.route('/emotionDetector')
-def sent_analyzer():
+def sent_detector():
     text_to_analyze = request.args.get('textToAnalyze')
-    
-    if not text_to_analyze:
-        return "Please provide some text to analyze using the 'textToAnalyze' query parameter.", 400
-    
     response = emotion_detector(text_to_analyze)
 
-    anger_score = response.get('anger', 0)
-    disgust_score = response.get('disgust', 0)
-    fear_score = response.get('fear', 0)
-    joy_score = response.get('joy', 0)
-    sadness_score = response.get('sadness', 0)
+    anger = response['anger']
+    disgust = response['disgust']
+    fear = response['fear']
+    joy = response['joy']
+    sadness = response['sadness']
+    dominant_emotion = response['dominant_emotion']
 
-    emotion_scores = {
-        'anger': anger_score,
-        'disgust': disgust_score,
-        'fear': fear_score,
-        'joy': joy_score,
-        'sadness': sadness_score
-    }
-    
-    dominant_emotion = max(emotion_scores, key=emotion_scores.get)
+    if dominant_emotion is None:
+        return "Invalid input! Try again."
 
-    result = f"For the given statement, the system response is 'anger': {anger_score}, 'disgust': {disgust_score}, 'fear': {fear_score}, 'joy': {joy_score}, 'sadness': {sadness_score}. The dominant emotion is {dominant_emotion}."
-
-    return render_template('result.html', result=result)
+    return f"For the given statement, the system response is " \
+           f"'anger': {anger}, 'disgust': {disgust}, 'fear': {fear}, " \
+           f"'joy': {joy}, and 'sadness': {sadness}. The dominant emotion is {dominant_emotion}."
 
 @app.route("/")
 def render_index_page():
